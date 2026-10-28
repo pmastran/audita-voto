@@ -67,7 +67,10 @@ def official_catalog(force: bool = False) -> dict[str, Any]:
     if not force and _catalog_cache["data"] is not None and time.time() - _catalog_cache["at"] < CACHE_SECONDS:
         return _catalog_cache["data"]
     try:
-        with _urlopen(CATALOG_URL) as reply:
+        # Evita caches intermediarios ao consultar metadados que podem mudar entre turnos.
+        fresh_url = CATALOG_URL + "&_audit_ts=" + str(int(time.time()))
+        req = urllib.request.Request(fresh_url, headers={"User-Agent": _USER_AGENT, "Accept": "application/json", "Cache-Control": "no-cache", "Pragma": "no-cache"})
+        with urllib.request.urlopen(req, timeout=35) as reply:
             payload = json.load(reply)
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, OSError) as e:
         raise OfficialDataError(f"Não foi possível consultar a API oficial do TSE: {e}") from e
