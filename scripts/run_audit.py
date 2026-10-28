@@ -28,7 +28,11 @@ def audit(args: argparse.Namespace):
         raise ValueError("UF ou turno inválido")
     if args.modo not in ("completo", "nominal") or not 0 <= args.comparecimento_minimo <= 9999 or not 2 <= args.minimo_secoes <= 20:
         raise ValueError("Parâmetros fora do intervalo permitido")
-    catalog = sync()
+    if os.getenv("AUDITA_STATIC_PUBLISH") == "1":
+        from audita.tse import official_catalog
+        catalog = official_catalog(force=True)
+    else:
+        catalog = sync()
     source = choose_archive(catalog, args.uf, args.turno)
     path = None
     try:
@@ -50,7 +54,14 @@ def audit(args: argparse.Namespace):
         report["versao_parser"] = PARSER_VERSION
         report["executado_em_utc"] = datetime.now(timezone.utc).isoformat()
         key = report_key(args, evidence["sha512"])
-        upsert("av_relatorios", [{
+        if os.getenv("AUDITA_STATIC_PUBLISH") == "1":
+            from pathlib import Path
+            folder = Path("public/data/reports")
+            folder.mkdir(parents=True, exist_ok=True)
+            filename = f"{args.uf}-{args.turno}-{args.modo}-{args.comparecimento_minimo}-{args.minimo_secoes}-{str(args.mesmo_municipio).lower()}.json"
+            (folder / filename).write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        else:
+            upsert("av_relatorios", [{
             "chave_relatorio": key,
             "uf": args.uf, "turno": args.turno, "modo": args.modo,
             "comparecimento_minimo": args.comparecimento_minimo,
@@ -62,7 +73,7 @@ def audit(args: argparse.Namespace):
             "executado_em": report["executado_em_utc"],
             "relatorio": report,
             "publicado": True,
-        }], conflict="chave_relatorio")
+            }], conflict="chave_relatorio")
         print("Auditoria salva a partir de fonte oficial. Filtros:",args.uf,args.turno,args.modo,
             "| seções processadas:",report["resumo"]["secoes_processadas"],
             "| grupos repetidos:",report["resumo"]["grupos_duplicados"],
