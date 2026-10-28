@@ -33,6 +33,13 @@ def write_catalog_snapshot():
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print('Catalog snapshot status:', snapshot['status'])
+    if snapshot['status'] == 'ok':
+        counts = {str(t): sum(1 for a in snapshot['catalog']['archives'] if a.get('turno') == t) for t in (1, 2)}
+        print('TSE catalog diagnosis:', json.dumps({'resources_total': snapshot['catalog']['resources_total'],
+            'metadata_modified': snapshot['catalog']['metadata_modified'],
+            'archives_by_turn': counts}, ensure_ascii=False))
+    else:
+        print('TSE catalog error:', snapshot.get('error'))
     return snapshot
 
 
