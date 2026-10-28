@@ -57,7 +57,7 @@ def _parse_name(name: str) -> tuple[str, int] | None:
 
 def _parse_filename(url: str) -> tuple[str, int] | None:
     fn = urllib.parse.urlparse(url).path.split("/")[-1]
-    m = re.match(r"bweb_([12])t_([A-Z]{2})_\d+\.zip$", fn, re.I)
+    m = re.match(r"bweb_([12])t_([A-Z]{2})(?:_\d+)?\.zip$", fn, re.I)
     if m and m.group(2).upper() in ALLOWED_UFS:
         return m.group(2).upper(), int(m.group(1))
     return None
