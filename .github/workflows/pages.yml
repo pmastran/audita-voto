@@ -23,13 +23,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Tentar auditoria oficial AC primeiro turno
+      - name: Tentar auditorias oficiais AC primeiro e segundo turno
         env:
           PYTHONPATH: .
           AUDITA_STATIC_PUBLISH: '1'
           AUDITA_MAX_ZIP_MB: '60'
         run: |
-          python -m scripts.run_audit --uf AC --turno 1 --modo completo --comparecimento-minimo 100 --minimo-secoes 2 --mesmo-municipio true || echo "Auditoria indisponivel ou nao validada; nenhum resultado sera inventado"
+          for TURNO in 1 2; do
+            echo "Tentando auditoria AC turno $TURNO"
+            python -m scripts.run_audit --uf AC --turno "$TURNO" --modo completo --comparecimento-minimo 100 --minimo-secoes 2 --mesmo-municipio true || echo "Arquivo ou validacao indisponivel no turno $TURNO"
+          done
       - name: Montar site sem credenciais secretas
         env:
           AUDITA_SUPABASE_URL: ${{ vars.AUDITA_SUPABASE_URL }}
