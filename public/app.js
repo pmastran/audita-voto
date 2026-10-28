@@ -7,7 +7,7 @@
   const officialApi = "https://xhxrkkqjmzccapovfici.supabase.co/functions/v1/audita-tse?op=health";
   async function readOfficialTable(table, query) {
     if (!configured) {
-      if (table !== "av_catalogos") throw new Error("Relatórios auditados ainda não estão publicados: falta conectar o Supabase.");
+      if (table !== "av_catalogos") throw new Error("Consulta de relatórios ainda não habilitada. O catálogo TSE está disponível, mas não há auditoria processada acessível neste site.");
       const response = await fetch("./data/catalogo-tse.json", { cache: "no-store" });
       if (!response.ok) throw new Error(`Catálogo oficial indisponível no site (HTTP ${response.status}).`);
       const snapshot = await response.json();
