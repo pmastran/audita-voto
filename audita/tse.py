@@ -87,7 +87,7 @@ def official_catalog(force: bool = False) -> dict[str, Any]:
         parsed = _parse_filename(url)
         # O catalogo CKAN pode publicar nomes com padroes diferentes do arquivo.
         # Aceitar identificacao pelo nome somente para ZIP BWEB oficial, com UF/turno explicitos.
-        if not parsed and nr and re.search(r"/bweb[^/]*\\.zip$", urllib.parse.urlparse(url).path, re.I):
+        if not parsed and nr and re.search(r"/bweb[^/]*\.zip$", urllib.parse.urlparse(url).path, re.I):
             parsed = nr
         if parsed and nr and parsed != nr:
             continue
