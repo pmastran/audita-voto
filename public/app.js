@@ -104,7 +104,8 @@
     const resources = state.catalog?.archives?.filter((r) => r.turno === t) || [];
     const ufs = [...new Set(resources.map((r) => r.uf))].sort();
     if (!ufs.length) {
-      box.innerHTML = `<option value="">${state.catalog ? "Nenhum ZIP BWEB identificado no catálogo para este turno" : "Catálogo oficial indisponível"}</option>`;
+      const firstCount = state.catalog?.archives?.filter((r) => r.turno === 1).length || 0;
+      box.innerHTML = `<option value="">${state.catalog ? `Sem arquivos do ${t}º turno neste catálogo (${firstCount} do 1º disponíveis)` : "Catálogo oficial indisponível"}</option>`;
       $("audit-button").disabled = true;
       return;
     }
