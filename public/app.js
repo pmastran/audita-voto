@@ -104,7 +104,7 @@
     const resources = state.catalog?.archives?.filter((r) => r.turno === t) || [];
     const ufs = [...new Set(resources.map((r) => r.uf))].sort();
     if (!ufs.length) {
-      box.innerHTML = `<option value="">${state.catalog ? "Nenhum arquivo oficial disponível para este turno" : "Catálogo oficial indisponível"}</option>`;
+      box.innerHTML = `<option value="">${state.catalog ? "Nenhum ZIP BWEB identificado no catálogo para este turno" : "Catálogo oficial indisponível"}</option>`;
       $("audit-button").disabled = true;
       return;
     }
@@ -121,7 +121,7 @@
       return;
     }
     if (!c.archives.length) {
-      $("sources-body").innerHTML = `<tr><td colspan="5" class="empty-row">O catálogo retornou sem arquivos BWEB identificáveis. Nenhuma auditoria disponível.</td></tr>`;
+      $("sources-body").innerHTML = `<tr><td colspan="5" class="empty-row">O leitor não identificou ZIPs BWEB entre ${esc(c.resources_total ?? "?")} recursos do catálogo. Isso NÃO comprova ausência de publicação no TSE. Verifique a URL da fonte e os registros de processamento.</td></tr>`;
       return;
     }
     $("sources-body").innerHTML = c.archives.map((r) => `<tr>
