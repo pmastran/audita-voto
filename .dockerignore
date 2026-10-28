@@ -1,0 +1,8 @@
+.git
+__pycache__
+*.pyc
+*.zip
+*.tar.gz
+tests/
+README.md
+deploy.sh

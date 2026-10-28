@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+.venv/
+node_modules/
+_site/
+.DS_Store
+.tmp/
+*.zip

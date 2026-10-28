@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#071420" />
+  <meta name="description" content="Audita Voto: conferência reproduzível de resultados eleitorais publicados no Portal de Dados Abertos do TSE." />
+  <title>Audita Voto — Transparência começa nos dados.</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Menu principal">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 38 38" fill="none"><rect x="2" y="2" width="34" height="34" rx="11" fill="#12352F"/><path d="M11 24L17 17L22 21L29 12" stroke="#5EF6C3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 29H28" stroke="#84AA9F" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+        <span class="brand-copy"><strong>AUDITA<span>VOTO</span></strong><small>INTELIGÊNCIA ELEITORAL</small></span>
+      </div>
+
+      <div class="nav-label">PLATAFORMA</div>
+      <nav class="nav-list" aria-label="Páginas">
+        <button class="nav-btn active" data-page="overview" aria-current="page">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg><span>Visão geral</span>
+        </button>
+        <button class="nav-btn" data-page="audit">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/><path d="m8 11 2 2 4-4"/></svg><span>Consultar auditorias</span>
+        </button>
+        <button class="nav-btn" data-page="sources">
+          <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v7c0 1.66 4.03 3 9 3s9-1.34 9-3V5M3 12v7c0 1.66 4.03 3 9 3s9-1.34 9-3v-7"/></svg><span>Fontes oficiais</span>
+        </button>
+        <button class="nav-btn" data-page="method">
+          <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3"/><path d="M9 2h6v4H9zM8 12h8M8 16h8"/></svg><span>Metodologia</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="source-mini"><span class="source-dot" id="side-dot"></span><div><strong id="side-status">Fonte não consultada</strong><small>Catálogo público do TSE</small></div></div>
+        <a class="side-external" href="https://dadosabertos.tse.jus.br/" target="_blank" rel="noopener noreferrer">Portal oficial do TSE <span aria-hidden="true">↗</span></a>
+        <div class="side-foot">Audita Voto <span>V1.1 · GitHub/Supabase</span> · Independente</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button id="menu-toggle" class="mobile-menu" aria-label="Abrir menu" aria-expanded="false">☰</button>
+        <div class="crumbs"><span>PLATAFORMA</span><span class="crumb-chevron">/</span><strong id="page-crumb">Visão geral</strong></div>
+        <div class="top-actions"><span class="top-date">ELEIÇÕES 2026</span><span class="top-indicator" id="top-indicator"><span class="pulse-dot"></span><span id="connection-text">Não verificado</span></span></div>
+      </header>
+      <div class="main-content">
+        <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+        <!-- VISÃO GERAL -->
+        <section class="page" id="page-overview" aria-labelledby="overview-title">
+          <div class="hero">
+            <div class="hero-glow"></div>
+            <div class="hero-lines" aria-hidden="true"></div>
+            <div class="hero-inner">
+              <div class="eyebrow"><span class="eyebrow-line"></span> A VERDADE ESTÁ NOS DADOS</div>
+              <h1 id="overview-title">Transparência começa<br />com <em>verificação.</em></h1>
+              <p>Uma plataforma independente para cruzar resultados eleitorais, encontrar coincidências numéricas e conferir a integridade de informações publicadas pelo TSE.</p>
+              <div class="hero-actions"><button class="button button-primary" data-go="audit">Consultar auditorias <span class="button-arrow">↗</span></button><button class="button button-quiet" data-go="method">Conhecer metodologia <span>→</span></button></div>
+            </div>
+            <div class="hero-stamp" aria-hidden="true"><span>01</span><small>FONTE OFICIAL<br />METODOLOGIA ABERTA</small></div>
+          </div>
+
+          <div class="section-head"><div><span class="section-kicker">ESTADO DO AMBIENTE</span><h2>Panorama de verificação</h2></div><span class="muted small">Somente dados efetivamente obtidos</span></div>
+          <div class="metrics">
+            <div class="metric"><span class="metric-label">Recursos de boletins no TSE <span class="metric-icon">↗</span></span><strong class="metric-number" id="stat-resources">—</strong><span class="metric-note" id="stat-resources-detail">Aguardando consulta ao catálogo</span></div>
+            <div class="metric"><span class="metric-label">Arquivos por UF e turno <span class="metric-icon">▤</span></span><strong class="metric-number" id="stat-files">—</strong><span class="metric-note" id="stat-files-detail">Aguardando consulta ao catálogo</span></div>
+            <div class="metric"><span class="metric-label">Último relatório consultado <span class="metric-icon">◷</span></span><strong class="metric-number metric-word" id="stat-audit">Não consultado</strong><span class="metric-note" id="stat-audit-detail">Ainda não foi consultado um relatório publicado</span></div>
+          </div>
+
+          <div class="overview-grid">
+            <div class="panel panel-feature">
+              <div class="panel-head"><span class="section-kicker">FLUXO DE AUDITORIA</span><span class="mini-tag">01 / 03</span></div>
+              <h3>Do arquivo oficial<br />ao resultado verificável.</h3>
+              <div class="steps">
+                <div class="step"><span class="step-num">01</span><div><strong>Origem autenticada</strong><p>Consulta ao catálogo oficial, seleção do boletim e verificação de hash SHA-512.</p></div><span class="step-mark">↗</span></div>
+                <div class="step"><span class="step-num">02</span><div><strong>Cruzamento determinístico</strong><p>Comparação por município, zona, seção, cargo e turno, sem números estimados.</p></div><span class="step-mark">↗</span></div>
+                <div class="step"><span class="step-num">03</span><div><strong>Ocorrências reproduzíveis</strong><p>Exibição do padrão encontrado, das seções envolvidas e da fonte que o sustenta.</p></div><span class="step-mark">↗</span></div>
+              </div>
+            </div>
+            <div class="panel panel-source"><div class="panel-head"><span class="section-kicker">FONTE DE DADOS</span><span class="dot-neutral"></span></div>
+              <div class="source-emblem" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="7" y="7" width="34" height="34" rx="12"/><path d="M16 17h16M16 24h16M16 31h10"/></svg></div>
+              <h3>Somente TSE.<br /><span>Nenhum dado fabricado.</span></h3><p>Os números exibidos pela plataforma vêm exclusivamente dos arquivos oficiais do Tribunal Superior Eleitoral. Dados inexistentes não viram zero.</p>
+              <a href="https://dadosabertos.tse.jus.br/dataset/resultados-2026-boletim-de-urna" target="_blank" rel="noopener noreferrer" class="under-link">Consultar conjunto oficial <span>↗</span></a>
+            </div>
+          </div>
+        </section>
+
+        <!-- AUDITORIA -->
+        <section class="page hidden" id="page-audit" aria-labelledby="audit-title">
+          <div class="page-header"><div><span class="section-kicker">MOTOR DE VERIFICAÇÃO</span><h1 id="audit-title">Consultar auditorias<span class="teal-dot">.</span></h1><p>Selecione um recorte para localizar relatórios publicados. O processamento ocorre no GitHub Actions usando arquivos oficiais do TSE e hashes SHA-512. A consulta não inicia processamento em segundo plano.</p></div><span class="page-tag"><span class="live-dot"></span> DADOS OFICIAIS</span></div>
+          <div class="audit-layout"><div class="panel audit-form-panel">
+            <div class="panel-head"><h2>Parâmetros de análise</h2><span class="mini-tag">PRESIDENTE · 2026</span></div>
+            <form id="audit-form" novalidate>
+              <div class="fields-2"><label class="field"><span>Unidade da Federação</span><select id="uf-select" name="uf" required><option value="">Carregando catálogo oficial...</option></select></label><label class="field"><span>Turno</span><select id="turno-select" name="turno"><option value="1">1º turno</option><option value="2">2º turno</option></select></label></div>
+              <label class="field"><span>Tipo de coincidência</span><select id="modo-select" name="modo"><option value="completo">Resultado completo: candidatos, brancos, nulos e comparecimento</option><option value="nominal">Somente votos nominais dos candidatos</option></select></label>
+              <div class="fields-2"><label class="field"><span>Comparecimento mínimo</span><input type="number" id="min-voters" value="100" min="0" max="9999" step="1" /></label><label class="field"><span>Mínimo de seções iguais</span><input type="number" id="min-match" value="2" min="2" max="20" step="1" /></label></div>
+              <label class="check-field"><input type="checkbox" id="same-municipality" checked /><span>Comparar seções dentro do mesmo município</span></label>
+              <div id="operator-field" class="field hidden"><label for="operator-key">Chave de operador para executar a auditoria</label><input id="operator-key" type="password" autocomplete="off" placeholder="Chave exibida na implantação" /><small>A chave não é enviada para outros serviços nem salva permanentemente.</small></div>
+              <button class="button button-primary submit-button" type="submit" id="audit-button" disabled>Consultar relatórios publicados <span>→</span></button>
+              <p class="form-hint">Novas análises são executadas pelo operador no GitHub Actions. A rotina limita arquivos a 60 MiB compactados e não interpreta coincidências como prova de irregularidade.</p>
+              <div id="operator-workflow" class="status-info" style="margin-top:14px">Para criar um novo relatório, um operador executa a rotina auditável no GitHub Actions. Nenhuma análise é iniciada nesta consulta pública. <a id="workflow-link" href="https://github.com" target="_blank" rel="noopener noreferrer" class="under-link" style="margin-top:8px">Abrir a rotina de auditoria ↗</a></div>
+            </form>
+          </div><div class="panel audit-side"><span class="section-kicker">PROTOCOLO DE CONFIANÇA</span><div class="trust-list"><div><span class="trust-icon">01</span><div><strong>Fonte isolada</strong><p>Apenas arquivos publicados pelo TSE são processados.</p></div></div><div><span class="trust-icon">02</span><div><strong>Integridade confirmada</strong><p>Sem hash oficial válido e correspondente, não há resultado.</p></div></div><div><span class="trust-icon">03</span><div><strong>Conclusão limitada</strong><p>Coincidência estatística é registrada sem acusação ou inferência causal.</p></div></div></div><div class="side-note">A comparação entre turnos e a conferência de versões distintas de totalização serão módulos posteriores; não são simuladas nesta versão.</div></div></div>
+          <div id="audit-result" class="results-area hidden" aria-live="polite"></div>
+        </section>
+
+        <!-- FONTES -->
+        <section class="page hidden" id="page-sources" aria-labelledby="sources-title">
+          <div class="page-header"><div><span class="section-kicker">ORIGEM DOCUMENTADA</span><h1 id="sources-title">Fontes oficiais<span class="teal-dot">.</span></h1><p>Último catálogo sincronizado pelo operador com a API do TSE. A tela indica a data da sincronização, sem simular atualização em tempo real.</p></div><button class="button button-outline" id="refresh-catalog">↻ Recarregar catálogo</button></div>
+          <div class="panel sources-panel"><div class="panel-head"><div><h2>Boletins de Urna 2026</h2><p id="catalog-info">Ainda não sincronizado pelo operador.</p></div><a class="under-link" href="https://dadosabertos.tse.jus.br/dataset/resultados-2026-boletim-de-urna" target="_blank" rel="noopener noreferrer">Abrir no TSE ↗</a></div>
+            <div class="table-wrap"><table class="data-table"><thead><tr><th>ESTADO</th><th>TURNO</th><th>RECURSO OFICIAL</th><th>INTEGRIDADE</th><th>FONTE</th></tr></thead><tbody id="sources-body"><tr><td colspan="5" class="empty-row">Consultando catálogo oficial...</td></tr></tbody></table></div>
+          </div>
+        </section>
+
+        <!-- METODOLOGIA -->
+        <section class="page hidden" id="page-method" aria-labelledby="method-title"><div class="page-header"><div><span class="section-kicker">TRANSPARÊNCIA POR PROJETO</span><h1 id="method-title">Metodologia<span class="teal-dot">.</span></h1><p>O que o Audita Voto verifica, como verifica e o que os dados não permitem concluir.</p></div></div>
+          <div class="method-grid"><article class="panel method-card"><span class="method-index">/ 01</span><h2>Origem exclusivamente oficial</h2><p>Descobrimos os recursos pela API do Portal de Dados Abertos do TSE. O arquivo CSV compactado vem do domínio oficial cdn.tse.jus.br, com validação SHA-512 contra o resumo publicado pelo Tribunal.</p></article><article class="panel method-card"><span class="method-index">/ 02</span><h2>Critérios determinísticos</h2><p>As seções são agrupadas por UF, município, zona, número da seção, cargo e turno. Verificamos votos nominais repetidos ou o vetor completo de resultados, sem alterar os valores originais.</p></article><article class="panel method-card"><span class="method-index">/ 03</span><h2>Conferência aritmética</h2><p>Para presidente, confrontamos a soma dos votos registrados com o comparecimento informado por seção e detectamos valores de comparecimento inconsistentes dentro do mesmo arquivo.</p></article><article class="panel method-card"><span class="method-index">/ 04</span><h2>Limite das conclusões</h2><p>Resultados idênticos podem ocorrer naturalmente, especialmente em seções pequenas. Uma coincidência, por si só, não demonstra erro de contagem nem fraude. O sistema não identifica CPFs, eleitores nem escolhas individuais.</p></article><article class="panel method-card"><span class="method-index">/ 05</span><h2>Reprodutibilidade</h2><p>O relatório identifica a URL oficial, o hash conferido, o arquivo lido, o instante de execução, a versão do processador, os parâmetros e as seções utilizadas. Os relatórios publicados podem ser consultados e exportados.</p></article><article class="panel method-card"><span class="method-index">/ 06</span><h2>Escopo da V1</h2><p>Esta versão usa GitHub Pages para consulta e Supabase para histórico persistente de relatórios. O operador audita uma UF/turno por execução do GitHub Actions. Cruzamentos entre turnos e escala nacional ainda não estão implementados.</p></article></div>
+          <div class="method-note"><strong>Princípio do projeto</strong><p>O Audita Voto é independente, não afiliado ao TSE, não atribui irregularidades a candidatos ou partidos e não fornece inferências sobre votos individuais. A validação de hash atesta integridade em relação ao arquivo publicado, não a correção de todo o processo eleitoral.</p></div>
+        </section>
+      </div>
+      <footer class="footer"><span>© 2026 AUDITA VOTO · INDEPENDENTE</span><span>Fonte exclusiva: <a href="https://dadosabertos.tse.jus.br/" target="_blank" rel="noopener noreferrer">dadosabertos.tse.jus.br ↗</a></span></footer>
+    </main>
+  </div>
+  <script src="./config.js" defer></script>
+  <script src="./app.js" defer></script>
+</body>
+</html>

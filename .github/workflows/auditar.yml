@@ -1,0 +1,68 @@
+name: Auditar boletins oficiais do TSE
+on:
+  workflow_dispatch:
+    inputs:
+      uf:
+        description: 'UF do arquivo (ex.: AC, SP)'
+        required: true
+        default: AC
+        type: string
+      turno:
+        description: 'Turno'
+        required: true
+        default: '1'
+        type: choice
+        options: ['1', '2']
+      modo:
+        description: 'Critério de coincidência'
+        required: true
+        default: completo
+        type: choice
+        options: [completo, nominal]
+      comparecimento_minimo:
+        description: 'Comparecimento mínimo por seção'
+        required: true
+        default: '100'
+        type: string
+      minimo_secoes:
+        description: 'Mínimo de seções com resultado igual'
+        required: true
+        default: '2'
+        type: string
+      mesmo_municipio:
+        description: 'Comparar apenas dentro do mesmo município?'
+        required: true
+        type: boolean
+        default: true
+permissions:
+  contents: read
+concurrency:
+  group: auditavoto-manual
+  cancel-in-progress: false
+jobs:
+  auditoria:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: .
+      SUPABASE_URL: ${{ vars.AUDITA_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.AUDITA_SUPABASE_SERVICE_ROLE_KEY }}
+      AUDITA_MAX_ZIP_MB: '60'
+      UF: ${{ inputs.uf }}
+      TURNO: ${{ inputs.turno }}
+      MODO: ${{ inputs.modo }}
+      MIN_COMPARECIMENTO: ${{ inputs.comparecimento_minimo }}
+      MIN_SECOES: ${{ inputs.minimo_secoes }}
+      MESMO_MUNICIPIO: ${{ inputs.mesmo_municipio }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Obter arquivo oficial, verificar hash, auditar e publicar
+        run: >-
+          python -m scripts.run_audit
+          --uf "$UF" --turno "$TURNO" --modo "$MODO"
+          --comparecimento-minimo "$MIN_COMPARECIMENTO"
+          --minimo-secoes "$MIN_SECOES"
+          --mesmo-municipio "$MESMO_MUNICIPIO"
