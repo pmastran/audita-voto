@@ -5,7 +5,18 @@
   const settings = window.AUDITA_CONFIG || {};
   const configured = Boolean(settings.supabaseUrl && settings.supabasePublishableKey);
   async function readOfficialTable(table, query) {
-    if (!configured) throw new Error("Conexão Supabase ainda não configurada. Configure o projeto e rode a sincronização oficial.");
+    if (!configured) {
+      if (table !== "av_catalogos") throw new Error("Relatórios auditados ainda não estão publicados: falta conectar o Supabase.");
+      const response = await fetch("./data/catalogo-tse.json", { cache: "no-store" });
+      if (!response.ok) throw new Error(`Catálogo oficial indisponível no site (HTTP ${response.status}).`);
+      const snapshot = await response.json();
+      const source = "https://dadosabertos.tse.jus.br/api/3/action/package_show?id=resultados-2026-boletim-de-urna";
+      if (snapshot.status !== "ok" || snapshot.source !== source || snapshot.catalog?.api_url !== source ||
+          !Array.isArray(snapshot.catalog?.archives)) {
+        throw new Error(snapshot.error || "O GitHub ainda não conseguiu consultar o catálogo oficial do TSE.");
+      }
+      return [{ conteudo: snapshot.catalog, atualizado_em: snapshot.retrieved_at }];
+    }
     const base = new URL(settings.supabaseUrl);
     if (base.protocol !== "https:" || !base.hostname.endsWith(".supabase.co")) throw new Error("Endereço Supabase inválido.");
     const api = new URL(`/rest/v1/${table}`, base);
@@ -61,7 +72,7 @@
   async function loadHealth() {
     state.health = { audit_requires_key: false };
     $("operator-field").classList.add("hidden");
-    $("connection-text").textContent = configured ? "Aguardando catálogo sincronizado" : "Conexão não configurada";
+    $("connection-text").textContent = configured ? "Aguardando catálogo sincronizado" : "Consultando catálogo TSE via GitHub Pages";
     const wl = $("workflow-link");
     if (settings.githubRepository && /^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(settings.githubRepository)) {
       wl.href = `https://github.com/${settings.githubRepository}/actions/workflows/auditar.yml`;
@@ -74,7 +85,7 @@
     $("top-indicator").classList.toggle("online", online);
     $("side-dot").classList.toggle("online", online);
     $("connection-text").textContent = online ? "Catálogo oficial sincronizado" : "Fonte não sincronizada";
-    $("side-status").textContent = online ? "Metadados publicados pelo operador" : "Fonte não sincronizada";
+    $("side-status").textContent = online ? (configured ? "Metadados oficiais no Supabase" : "Catálogo oficial via GitHub Pages") : "Fonte não sincronizada";
     $("stat-resources").textContent = online ? formatNumber(c.resources_total) : "—";
     $("stat-resources-detail").textContent = online ? "Recursos listados pelo catálogo oficial" : "Ainda sem catálogo sincronizado";
     $("stat-files").textContent = online ? formatNumber(c.archives.length) : "—";
