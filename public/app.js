@@ -218,7 +218,16 @@
         "publicado":"eq.true",
         "order":"executado_em.desc", "limit":"1",
       });
-      const rows = await readOfficialTable("av_relatorios", q);
+      let rows;
+      if (!configured) {
+        const filename = [args.uf, args.turno, args.modo, args.comparecimento_minimo, args.minimo_secoes, String(args.mesmo_municipio)].join("-") + ".json";
+        const response = await fetch("./data/reports/" + filename, {cache:"no-store"});
+        if (response.status === 404) rows = [];
+        else {
+          if (!response.ok) throw new Error("Falha ao carregar relatório oficial publicado.");
+          rows = [{relatorio: await response.json()}];
+        }
+      } else rows = await readOfficialTable("av_relatorios", q);
       if (!rows.length) {
         state.report = null;
         $("audit-result").innerHTML = `<div class="status-info"><strong>Sem auditoria publicada para os filtros escolhidos.</strong> Nenhum resultado foi inferido. Para executar esse recorte, abra a rotina no GitHub Actions, escolha os parâmetros e publique o relatório validado.</div>`;
