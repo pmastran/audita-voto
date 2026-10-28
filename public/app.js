@@ -4,6 +4,7 @@
   const $ = (id) => document.getElementById(id);
   const settings = window.AUDITA_CONFIG || {};
   const configured = Boolean(settings.supabaseUrl && settings.supabasePublishableKey);
+  const officialApi = "https://xhxrkkqjmzccapovfici.supabase.co/functions/v1/audita-tse?op=health";
   async function readOfficialTable(table, query) {
     if (!configured) {
       if (table !== "av_catalogos") throw new Error("Relatórios auditados ainda não estão publicados: falta conectar o Supabase.");
@@ -71,6 +72,7 @@
 
   async function loadHealth() {
     state.health = { audit_requires_key: false };
+    try { const r = await fetch(officialApi, {signal: AbortSignal.timeout(8000)}); const data = await r.json(); if (r.ok && data.status === "ok" && data.service === "audita-voto-tse") state.health.tse_api_online = true; } catch (_) { state.health.tse_api_online = false; }
     $("operator-field").classList.add("hidden");
     $("connection-text").textContent = configured ? "Aguardando catálogo sincronizado" : "Consultando catálogo TSE via GitHub Pages";
     const wl = $("workflow-link");
@@ -84,7 +86,7 @@
     const online = Boolean(c && Array.isArray(c.archives));
     $("top-indicator").classList.toggle("online", online);
     $("side-dot").classList.toggle("online", online);
-    $("connection-text").textContent = online ? "Catálogo oficial sincronizado" : "Fonte não sincronizada";
+    $("connection-text").textContent = online ? (state.health?.tse_api_online ? "Catálogo TSE sincronizado · API ativa" : "Catálogo oficial sincronizado") : "Fonte não sincronizada";
     $("side-status").textContent = online ? (configured ? "Metadados oficiais no Supabase" : "Catálogo oficial via GitHub Pages") : "Fonte não sincronizada";
     $("stat-resources").textContent = online ? formatNumber(c.resources_total) : "—";
     $("stat-resources-detail").textContent = online ? "Recursos listados pelo catálogo oficial" : "Ainda sem catálogo sincronizado";
