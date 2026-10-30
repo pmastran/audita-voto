@@ -23,16 +23,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Tentar auditorias oficiais AC primeiro e segundo turno
+      - name: Auditar recortes piloto com arquivos oficiais
         env:
           PYTHONPATH: .
           AUDITA_STATIC_PUBLISH: '1'
-          AUDITA_MAX_ZIP_MB: '60'
+          AUDITA_MAX_ZIP_MB: '250'
         run: |
-          for TURNO in 1 2; do
-            echo "Tentando auditoria AC turno $TURNO"
-            python -m scripts.run_audit --uf AC --turno "$TURNO" --modo completo --comparecimento-minimo 100 --minimo-secoes 2 --mesmo-municipio true || echo "Arquivo ou validacao indisponivel no turno $TURNO"
+          for SPEC in "AC 1" "AC 2" "MA 2"; do
+            set -- $SPEC
+            echo "::group::Auditoria $1 turno $2"
+            if python -m scripts.run_audit --uf "$1" --turno "$2" --modo completo --comparecimento-minimo 100 --minimo-secoes 2 --mesmo-municipio true; then
+              echo "AUDITORIA_PUBLICADA $1 turno $2"
+            else
+              echo "::warning::AUDITORIA_FALHOU $1 turno $2; consultar mensagem acima"
+            fi
+            echo "::endgroup::"
           done
+          echo "Arquivos de relatorio produzidos:"
+          find public/data/reports -maxdepth 1 -type f -name '*.json' -print 2>/dev/null || true
       - name: Montar site sem credenciais secretas
         env:
           AUDITA_SUPABASE_URL: ${{ vars.AUDITA_SUPABASE_URL }}
